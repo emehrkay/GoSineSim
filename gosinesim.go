@@ -9,8 +9,16 @@ import (
 	"sort"
 )
 
+type Item struct {
+	Id   string
+	Data map[string]float64
+}
+
+type Items []Item
+
 type Result struct {
 	Similarity float64
+	Id         string
 	Data       map[string]float64
 }
 
@@ -28,47 +36,47 @@ func (slice GoSignSimResults) Swap(i, j int) {
 	slice[i], slice[j] = slice[j], slice[i]
 }
 
-func norm(obj map[string]float64) float64 {
+func norm(obj Item) float64 {
 	var norm float64 = 0
 
-	for _, v := range obj {
+	for _, v := range obj.Data {
 		norm += v * v
 	}
 
 	return math.Sqrt(norm)
 }
 
-func dotProduct(source map[string]float64, other map[string]float64) float64 {
+func dotProduct(source, other Item) float64 {
 	var product float64 = 0
 
-	for k, v := range source {
-		product += v * other[k]
+	for k, v := range source.Data {
+		product += v * other.Data[k]
 	}
 
 	return product
 }
 
-func pad(source map[string]float64, other map[string]float64) (map[string]float64, map[string]float64) {
-	for k, _ := range source {
-		_, okay := other[k]
+func pad(source, other Item) (Item, Item) {
+	for k, _ := range source.Data {
+		_, okay := other.Data[k]
 
 		if okay == false {
-			other[k] = 0
+			other.Data[k] = 0
 		}
 	}
 
-	for k, _ := range other {
-		_, okay := source[k]
+	for k, _ := range other.Data {
+		_, okay := source.Data[k]
 
 		if okay == false {
-			source[k] = 0
+			source.Data[k] = 0
 		}
 	}
 
 	return source, other
 }
 
-func getScore(source map[string]float64, other map[string]float64) float64 {
+func getScore(source, other Item) float64 {
 	source, other = pad(source, other)
 	dem := norm(source) * norm(other)
 
@@ -79,12 +87,12 @@ func getScore(source map[string]float64, other map[string]float64) float64 {
 	return 0
 }
 
-func CoseineSimilarity(source map[string]float64, pool []map[string]float64) GoSignSimResults {
+func CoseineSimilarity(source Item, pool Items) GoSignSimResults {
 	var results GoSignSimResults
 
 	for _, other := range pool {
 		score := getScore(source, other)
-		res := Result{Similarity: score, Data: other}
+		res := Result{Similarity: score, Data: other.Data, Id: other.Id}
 		results = append(results, res)
 	}
 
@@ -99,7 +107,7 @@ func main() {
 
 	flag.Parse()
 
-	var obj map[string]float64
+	var obj Item
 	string_bytes := []byte(*source)
 	err := json.Unmarshal(string_bytes, &obj)
 
@@ -107,7 +115,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var pool_obj []map[string]float64
+	var pool_obj Items
 	pool_bytes := []byte(*pool)
 	pool_err := json.Unmarshal(pool_bytes, &pool_obj)
 
@@ -118,5 +126,5 @@ func main() {
 	results := CoseineSimilarity(obj, pool_obj)
 	results_json, _ := json.Marshal(results)
 
-	fmt.Printf("Results: %s \n", results_json)
+	fmt.Printf("%s", results_json)
 }
