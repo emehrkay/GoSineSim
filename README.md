@@ -30,12 +30,14 @@ GoSineSim works by comparing one data structure against one or more. Each item s
 ### Data Rules
 
 1. Each item set must have a string `id` field and an object literal `data` field. The `data` is a simple key: value pair where the keys are stings and the values are floats
+    
     ```go
     type Item struct {
     	Id   string
     	Data map[string]float64
     }
     ```
+
 2. The `source` argument is a single item
 3. The `pool` argument is a list of items
 
