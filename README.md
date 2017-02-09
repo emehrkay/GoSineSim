@@ -4,7 +4,7 @@ Cosine Similarity of two or more shallow JSON objects in Go.
 ## Usage
 
 ```
-gosignsim --source=$JSON_OBJ_LITERAL --pool=[$JSON_OBJ_LITERAL,...]
+gosignsim --source=$JSON_OBJ_LITERAL --pool=[$JSON_OBJ_LITERAL,...] [--threshold=float]
 ```
 
 GoSineSim works by comparing one data structure against one or more. Each item should be made up like this:
@@ -50,5 +50,5 @@ GoSineSim works by comparing one data structure against one or more. Each item s
 Which would produce the result
 
 ```
-[{"Similarity":0.6632728204403626,"Id":"44","Data":{"cars":87,"money":40}}]
+[{"Similarity":66.32728204403626,"Id":"44","Data":{"cars":87,"money":40}}]
 ```

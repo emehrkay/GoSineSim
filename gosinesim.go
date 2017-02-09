@@ -81,22 +81,25 @@ func getScore(source, other Item) float64 {
 	dem := norm(source) * norm(other)
 
 	if dem > 0 {
-		return dotProduct(source, other) / dem
+		return (dotProduct(source, other) / dem) * 100
 	}
 
 	return 0
 }
 
-func CoseineSimilarity(source Item, pool Items) GoSignSimResults {
+func CoseineSimilarity(source Item, pool Items, threshold float64) GoSignSimResults {
 	var results GoSignSimResults
 
 	for _, other := range pool {
 		score := getScore(source, other)
-		res := Result{Similarity: score, Data: other.Data, Id: other.Id}
-		results = append(results, res)
+
+		if score >= threshold {
+			res := Result{Similarity: score, Data: other.Data, Id: other.Id}
+			results = append(results, res)
+		}
 	}
 
-	sort.Sort(results)
+	sort.Sort(sort.Reverse(results))
 
 	return results
 }
@@ -104,6 +107,7 @@ func CoseineSimilarity(source Item, pool Items) GoSignSimResults {
 func main() {
 	source := flag.String("source", "", "The source JSON object to compare")
 	pool := flag.String("pool", "", "The data that will be compared against to source")
+	threshold := flag.Float64("threshold", 0.0, "The lower limit ")
 
 	flag.Parse()
 
@@ -123,7 +127,7 @@ func main() {
 		log.Fatal(pool_err)
 	}
 
-	results := CoseineSimilarity(obj, pool_obj)
+	results := CoseineSimilarity(obj, pool_obj, float64(*threshold))
 	results_json, _ := json.Marshal(results)
 
 	fmt.Printf("%s", results_json)
