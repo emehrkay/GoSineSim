@@ -55,9 +55,9 @@ Which would produce the result
 
 ### Benchmarks
 
-I wrote a very simple benchmarking suite in python `bench.py` that simulates what it would be like to compare a random sampling of items from another language's system calling method.
+I wrote a very simple benchmarking suite in python `bench.py` that simulates what it would be like to compare a random sampling of items from python's system call method.
 
-The file creates 100,000 items which can contain between 5 and 15 entries. It then chunks the items into groups of 100, 1000, 5000... up to 100k. As you can see a comparison of less than ~5k items can be done in realtime.
+The file creates 100,000 items which can contain between 5 and 15 entries. It then chunks the items into groups of 100, 1000, 5000... up to 100k. As you can see from the results below, a comparison of less than ~5k items can be done in realtime.
 
 My specs are: macOS, 2.5 Core i5, 16GB 1600 DDR3, and an SSD
 
