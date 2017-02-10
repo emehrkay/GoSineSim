@@ -92,18 +92,18 @@ func CoseineSimilarity(source Item, pool Items, threshold float64) GoSignSimResu
 	var results = make(GoSignSimResults, len(pool))
 
 	for i, other := range pool {
-		score_c := make(chan float64, 1)
+		go func(i int, other Item) {
+			score_c := make(chan float64, 1)
 
-		getScore(source, other, score_c)
+			getScore(source, other, score_c)
 
-		score := <-score_c
+			score := <-score_c
 
-		if score >= threshold {
-			go func(i int, score float64, other Item) {
+			if score >= threshold {
 				res := Result{Similarity: score, Data: other.Data, Id: other.Id}
 				results[i] = res
-			}(i, score, other)
-		}
+			}
+		}(i, other)
 	}
 
 	sort.Sort(sort.Reverse(results))
