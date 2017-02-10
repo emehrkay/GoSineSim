@@ -129,7 +129,7 @@ func main() {
 
 	pf := *pool_file
 	var pool_obj Items
-	fmt.Printf("PF %s", pf)
+
 	if pf != "" {
 		pool_file_bytes, pool_file_err := ioutil.ReadFile(string(*pool_file))
 
@@ -152,7 +152,11 @@ func main() {
 	}
 
 	results := CoseineSimilarity(obj, pool_obj, float64(*threshold))
-	results_json, _ := json.Marshal(results)
+	results_json, results_err := json.Marshal(results)
+
+	if results_err != nil {
+		log.Fatal(results_err)
+	}
 
 	fmt.Printf("%s", results_json)
 }

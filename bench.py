@@ -6,22 +6,22 @@ import sys
 import time
 
 
-TAGS = ['money', 'computer', 'shoe', 'dress', 'car', 'house', 'apple',
+ITEMS = ['money', 'computer', 'shoe', 'dress', 'car', 'house', 'apple',
     'pencil', 'foot', 'star', 'planet', 'color', 'straw', 'battery',
     'controller', 'box', 'ram', 'harddrive', 'phone', 'toe', 'arm',
     'spanish', 'child', 'school', 'math', 'shorts', 'pizza', 'peroxide',
     'duster', 'light', 'table', 'up', 'cord', 'iron', 'bed', 'closet']
-TAG_COUNT = (5, 16)
-TAG_SCORE = (1, 10)
-POOL_COUNT = 1000000
+ITEM_COUNT = (5, 16)
+ITEM_SCORE = (1, 10)
+POOL_COUNT = 100000
 
 
 def make_item():
     data = {}
 
-    for i in range(TAG_COUNT[0], TAG_COUNT[1]):
-        tag = random.choice(TAGS)
-        data[tag] = random.randint(TAG_SCORE[0], TAG_SCORE[1])
+    for i in range(ITEM_COUNT[0], ITEM_COUNT[1]):
+        tag = random.choice(ITEMS)
+        data[tag] = random.randint(ITEM_SCORE[0], ITEM_SCORE[1])
 
     return {
         'id': str(random.random()),
@@ -38,13 +38,14 @@ def run(source, pool, count=None):
     pool = json.dumps(pool)
     pool_file = '/tmp/gosinesim-{}.json'.format(pool_len)
 
-    with open(pool_file, 'a') as j:
+    with open(pool_file, 'w') as j:
         j.write(pool)
 
     cmd = "./gosinesim --source='{}' --pool_file='{}' > /dev/null 2>&1".format(
         source, pool_file)
 
-    print '*' * 80
+    print "\n"
+    print '*' * 40
     print "\nRunning {} tags\n".format(pool_len)
 
     for i in range(3):
@@ -52,17 +53,22 @@ def run(source, pool, count=None):
         os.system(cmd)
         dif = time.time() - start
 
-        print "run {} took {}".format(i + 1, dif)
+        print "\trun {} took {}".format(i + 1, dif)
 
 
 if __name__ == '__main__':
-    print "*" * 80
-    print "\nBuilding the pool of {} tags".format(POOL_COUNT)
+    print "*" * 60
+    print "\nBuilding the pool of {} items".format(POOL_COUNT)
 
     start = time.time()
     source = make_item()
     pool = [make_item() for i in range(POOL_COUNT)]
-    counts = [100, 1000, 10000, 50000, None]
+    counts = [100, 1000, 5000, 10000, 25000, 50000, 75000, None]
+
     print "\ndone building the pool: {}".format(time.time() - start)
 
     [run(source, pool, c) for c in counts]
+
+    print "\n"
+    print "=" * 60
+    print "\nfinished running: {}".format(time.time() - start)
