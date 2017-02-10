@@ -76,26 +76,32 @@ func pad(source, other Item) (Item, Item) {
 	return source, other
 }
 
-func getScore(source, other Item) float64 {
+func getScore(source, other Item, c chan float64) {
 	source, other = pad(source, other)
 	dem := norm(source) * norm(other)
 
 	if dem > 0 {
-		return (dotProduct(source, other) / dem) * 100
+		c <- (dotProduct(source, other) / dem) * 100
+	} else {
+		c <- 0
 	}
-
-	return 0
 }
 
 func CoseineSimilarity(source Item, pool Items, threshold float64) GoSignSimResults {
-	var results GoSignSimResults
+	var results = make(GoSignSimResults, len(pool))
 
-	for _, other := range pool {
-		score := getScore(source, other)
+	for i, other := range pool {
+		score_c := make(chan float64, 1)
+
+		getScore(source, other, score_c)
+
+		score := <-score_c
 
 		if score >= threshold {
-			res := Result{Similarity: score, Data: other.Data, Id: other.Id}
-			results = append(results, res)
+			go func(i int, score float64, other Item) {
+				res := Result{Similarity: score, Data: other.Data, Id: other.Id}
+				results[i] = res
+			}(i, score, other)
 		}
 	}
 
