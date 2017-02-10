@@ -46,7 +46,7 @@ def run(source, pool, count=None):
 
     print "\n"
     print '*' * 40
-    print "\nRunning {} tags\n".format(pool_len)
+    print "\nComparing {} items\n".format(pool_len)
 
     for i in range(3):
         start = time.time()

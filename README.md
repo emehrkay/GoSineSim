@@ -65,81 +65,81 @@ My specs are: macOS, 2.5 Core i5, 16GB 1600 DDR3, and an SSD
 
     Building the pool of 100000 items
 
-    done building the pool: 4.08293294907
+    done building the pool: 3.90105509758
 
 
     ****************************************
 
-    Running 100 tags
+    Comparing 100 items
 
-    	run 1 took 0.0148870944977
-    	run 2 took 0.01486992836
-    	run 3 took 0.0157899856567
-
-
-    ****************************************
-
-    Running 1000 tags
-
-    	run 1 took 0.0886211395264
-    	run 2 took 0.0958361625671
-    	run 3 took 0.0808701515198
+    	run 1 took 0.0213799476624
+    	run 2 took 0.0232019424438
+    	run 3 took 0.0260858535767
 
 
     ****************************************
 
-    Running 5000 tags
+    Comparing 1000 items
 
-    	run 1 took 0.397789955139
-    	run 2 took 0.366457939148
-    	run 3 took 0.390224933624
-
-
-    ****************************************
-
-    Running 10000 tags
-
-    	run 1 took 0.731570959091
-    	run 2 took 0.7547519207
-    	run 3 took 0.756834030151
+    	run 1 took 0.104200839996
+    	run 2 took 0.0777702331543
+    	run 3 took 0.0913891792297
 
 
     ****************************************
 
-    Running 25000 tags
+    Comparing 5000 items
 
-    	run 1 took 1.84421396255
-    	run 2 took 1.81892490387
-    	run 3 took 1.84610414505
-
-
-    ****************************************
-
-    Running 50000 tags
-
-    	run 1 took 3.67140698433
-    	run 2 took 3.70125007629
-    	run 3 took 3.64767408371
+    	run 1 took 0.385035037994
+    	run 2 took 0.361575126648
+    	run 3 took 0.383772134781
 
 
     ****************************************
 
-    Running 75000 tags
+    Comparing 10000 items
 
-    	run 1 took 5.64399909973
-    	run 2 took 5.55435490608
-    	run 3 took 5.80814218521
+    	run 1 took 0.728197813034
+    	run 2 took 0.706686019897
+    	run 3 took 0.723525047302
 
 
     ****************************************
 
-    Running 100000 tags
+    Comparing 25000 items
 
-    	run 1 took 7.6290500164
-    	run 2 took 7.41003990173
-    	run 3 took 7.53508520126
+    	run 1 took 1.84598708153
+    	run 2 took 1.81941795349
+    	run 3 took 1.80622196198
+
+
+    ****************************************
+
+    Comparing 50000 items
+
+    	run 1 took 3.73297214508
+    	run 2 took 3.61929798126
+    	run 3 took 3.69822692871
+
+
+    ****************************************
+
+    Comparing 75000 items
+
+    	run 1 took 5.52517104149
+    	run 2 took 5.44108700752
+    	run 3 took 5.32282090187
+
+
+    ****************************************
+
+    Comparing 100000 items
+
+    	run 1 took 7.28775191307
+    	run 2 took 7.29696202278
+    	run 3 took 7.31481003761
 
 
     ============================================================
 
-    finished running: 65.6274158955
+    finished running: 63.7240190506
