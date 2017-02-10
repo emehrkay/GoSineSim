@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math"
 	"sort"
@@ -113,6 +114,7 @@ func CoseineSimilarity(source Item, pool Items, threshold float64) GoSignSimResu
 func main() {
 	source := flag.String("source", "", "The source JSON object to compare")
 	pool := flag.String("pool", "", "The data that will be compared against to source")
+	pool_file := flag.String("pool_file", "", "An optional file to read the pool data from")
 	threshold := flag.Float64("threshold", 0.0, "The lower limit ")
 
 	flag.Parse()
@@ -125,12 +127,28 @@ func main() {
 		log.Fatal(err)
 	}
 
+	pf := *pool_file
 	var pool_obj Items
-	pool_bytes := []byte(*pool)
-	pool_err := json.Unmarshal(pool_bytes, &pool_obj)
+	fmt.Printf("PF %s", pf)
+	if pf != "" {
+		pool_file_bytes, pool_file_err := ioutil.ReadFile(string(*pool_file))
 
-	if pool_err != nil {
-		log.Fatal(pool_err)
+		if pool_file_err != nil {
+			fmt.Print(pool_file_err)
+		}
+
+		pool_err := json.Unmarshal(pool_file_bytes, &pool_obj)
+
+		if pool_err != nil {
+			log.Fatal(pool_err)
+		}
+	} else {
+		pool_bytes := []byte(*pool)
+		pool_err := json.Unmarshal(pool_bytes, &pool_obj)
+
+		if pool_err != nil {
+			log.Fatal(pool_err)
+		}
 	}
 
 	results := CoseineSimilarity(obj, pool_obj, float64(*threshold))
