@@ -4,8 +4,16 @@ Cosine Similarity of two or more shallow JSON objects in Go.
 ## Usage
 
 ```
-gosignsim --source=$JSON_OBJ_LITERAL --pool=[$JSON_OBJ_LITERAL,...] [--threshold=float]
+gosignsim --source=$JSON_OBJ_LITERAL --pool=[$JSON_OBJ_LITERAL,...] [--threshold=float] [--output_file=/path/to/save/results] [--verbose=boolean]
 ```
+
+### Options
+
+* `source` -- This is the main object that all other objects will be compared against.
+* `pool` -- This is a list of objects that will be compared against the source object.
+* `threshold` (optional) -- This is the minimal similarity value that an object must meet in order to make the cut.
+* `output_file` (optional) -- If this option is selected the resulting JSON will be saved to this file.
+* `verbose` (optional) -- If this is set to `true(thy)` various data will be sent to stdout. ie, if `output_file` was set, you would still see the resulting JSON.
 
 GoSineSim works by comparing one data structure against one or more. Each item should be made up like this:
 

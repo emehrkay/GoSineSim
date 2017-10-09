@@ -41,19 +41,30 @@ def run(source, pool, count=None):
     with open(pool_file, 'w') as j:
         j.write(pool)
 
-    cmd = "./gosinesim --source='{}' --pool_file='{}' > /dev/null 2>&1".format(
-        source, pool_file)
+    def runner(worker=False):
+        worker_pool = ''
 
-    print "\n"
-    print '*' * 40
-    print "\nComparing {} items\n".format(pool_len)
+        if worker:
+            worker_pool = 'using the worker pool'
+            cmd = "./gosinesim --source='{}' --pool_file='{}' --worker=true > /dev/null 2>&1".format(
+                source, pool_file)
+        else:
+            cmd = "./gosinesim --source='{}' --pool_file='{}' > /dev/null 2>&1".format(
+                source, pool_file)
 
-    for i in range(3):
-        start = time.time()
-        os.system(cmd)
-        dif = time.time() - start
+        print "\n"
+        print '*' * 40
+        print "\nComparing {} items {} \n".format(pool_len, worker_pool)
 
-        print "\trun {} took {}".format(i + 1, dif)
+        for i in range(3):
+            start = time.time()
+            os.system(cmd)
+            dif = time.time() - start
+
+            print "\trun {} took {}".format(i + 1, dif)
+
+    runner()
+    runner(worker=True)
 
 
 if __name__ == '__main__':
