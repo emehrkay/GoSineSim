@@ -114,9 +114,7 @@ func CoseineSimilarityWorker(source Item, pool Items, threshold float64) GoSignS
 
 	go func() {
 		for _, item := range pool {
-			sourceCopy := source
-			itemCopy := item
-			go getResultScore(sourceCopy, itemCopy, resChan)
+			go getResultScore(source, item, resChan)
 		}
 	}()
 
