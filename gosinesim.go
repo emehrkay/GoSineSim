@@ -8,21 +8,20 @@ import (
 	"log"
 	"math"
 	"os"
-	"sort"
-	"sync"
+	// "sort"
 )
 
 type Item struct {
-	Id   string
-	Data map[string]float64
+	ID   string             `json:"id"`
+	Data map[string]float64 `json:"data"`
 }
 
 type Items []Item
 
 type Result struct {
-	Similarity float64
-	Id         string
-	Data       map[string]float64
+	ID         string             `json:"id"`
+	Similarity float64            `json:"similarity"`
+	Data       map[string]float64 `json:"data"`
 }
 
 type GoSignSimResults []Result
@@ -60,102 +59,75 @@ func dotProduct(source, other Item) float64 {
 }
 
 func pad(source, other Item) (Item, Item) {
-	for k, _ := range source.Data {
-		_, okay := other.Data[k]
+	newSource := source
+	newSource.Data = map[string]float64{}
+
+	for k, v := range source.Data {
+		newSource.Data[k] = v
+	}
+
+	newOther := other
+	newOther.Data = map[string]float64{}
+
+	for k, v := range other.Data {
+		newOther.Data[k] = v
+	}
+
+	for k := range newSource.Data {
+		_, okay := newOther.Data[k]
 
 		if okay == false {
-			other.Data[k] = 0
+			newOther.Data[k] = 0
 		}
 	}
 
-	for k, _ := range other.Data {
-		_, okay := source.Data[k]
+	for k := range newOther.Data {
+		_, okay := newSource.Data[k]
 
 		if okay == false {
-			source.Data[k] = 0
+			newSource.Data[k] = 0
 		}
 	}
 
-	return source, other
+	return newSource, newOther
 }
 
-func getScore(source, other Item, c chan float64) {
+func getResultScore(source, other Item, resultChan chan Result) {
 	source, other = pad(source, other)
 	dem := norm(source) * norm(other)
+	var score float64
 
 	if dem > 0 {
-		c <- (dotProduct(source, other) / dem) * 100
-	} else {
-		c <- 0
+		score = (dotProduct(source, other) / dem) * 100
 	}
-
-	close(c)
-}
-
-func CoseineSimilarity(source Item, pool Items, threshold float64) GoSignSimResults {
-	var results = make(GoSignSimResults, len(pool))
-
-	for i, other := range pool {
-		go func(i int, other Item) {
-			score_c := make(chan float64, 1)
-
-			getScore(source, other, score_c)
-
-			score := <-score_c
-
-			if score >= threshold {
-				res := Result{Similarity: score, Data: other.Data, Id: other.Id}
-				results[i] = res
-			}
-		}(i, other)
-	}
-
-	sort.Sort(sort.Reverse(results))
-
-	return results
-}
-
-func getScoreWorker(source Item, other chan Item, c chan float64, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	for o := range other {
-		source_new, other_new := pad(source, o)
-		dem := norm(source_new) * norm(other_new)
-
-		if dem > 0 {
-			c <- (dotProduct(source_new, other_new) / dem) * 100
-		} else {
-			c <- 0
-		}
+	// fmt.Printf("-----DEM: %v SCORE: %v\n\n", dem, score)
+	resultChan <- Result{
+		ID:         other.ID,
+		Similarity: score,
+		Data:       other.Data,
 	}
 }
 
 func CoseineSimilarityWorker(source Item, pool Items, threshold float64) GoSignSimResults {
-	var wg sync.WaitGroup
-	var results = make(GoSignSimResults, len(pool))
+	results := make([]Result, 0)
+	resChan := make(chan Result, len(pool))
 
-	workers := 3
-	wg.Add(workers)
+	go func() {
+		for _, item := range pool {
+			sourceCopy := source
+			itemCopy := item
+			go getResultScore(sourceCopy, itemCopy, resChan)
+		}
+	}()
 
-	pool_ch := make(chan Item)
-	score_ch := make(chan float64)
-
-	for i := 0; i < workers; i++ {
-		go getScoreWorker(source, pool_ch, score_ch, &wg)
+	for i := 0; i < len(pool); i++ {
+		select {
+		case res := <-resChan:
+			if res.Similarity >= threshold {
+				results = append(results, res)
+			}
+		}
 	}
-
-	for i, other := range pool {
-		pool_ch <- other
-		score_cal := <-score_ch
-		res := Result{Similarity: score_cal, Data: other.Data, Id: other.Id}
-		results[i] = res
-	}
-
-	close(pool_ch)
-	close(score_ch)
-	wg.Wait()
-
-	sort.Sort(sort.Reverse(results))
 
 	return results
 }
@@ -165,7 +137,6 @@ func main() {
 	pool := flag.String("pool", "", "The data that will be compared against to source")
 	pool_file := flag.String("pool_file", "", "An optional file to read the pool data from")
 	threshold := flag.Float64("threshold", 0.0, "The lower limit ")
-	worker := flag.Bool("worker", false, "Use the worker processing")
 	output_file := flag.String("output_file", "", "The file to save the resulting JSON")
 	verbose := flag.Bool("verbose", false, "Verbose mode")
 
@@ -204,12 +175,7 @@ func main() {
 		}
 	}
 
-	if *worker {
-		results = CoseineSimilarityWorker(obj, pool_obj, float64(*threshold))
-	} else {
-		results = CoseineSimilarity(obj, pool_obj, float64(*threshold))
-	}
-
+	results = CoseineSimilarityWorker(obj, pool_obj, float64(*threshold))
 	results_json, results_err := json.Marshal(results)
 
 	if results_err != nil {
